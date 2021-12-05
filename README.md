@@ -20,8 +20,11 @@ We are using [serverless-stack](https://github.com/serverless-stack/serverless-s
 
 The project has two main configuration environment varibles:
 
-- BUCKET_NAME: which is the name of the S3 bucket of step 2 we are going to create
-- RECIPIENTS: is a comma separated lists of recipients we are going to handle with this email forwarder
+- BUCKET_NAME, which is the name of the S3 bucket of step 2 we are going to create
+
+- FORWARD_MAPPING_SSM_KEY, which is the key of SSM parameter that stores a JSON mapping for forwarding
+
+- RECIPIENTS, which is a comma separated lists of recipients we are going to handle with this email forwarder
 
 ### `npm run start`
 

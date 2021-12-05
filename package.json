@@ -25,6 +25,7 @@
   "dependencies": {
     "@aws-cdk/core": "1.132.0",
     "@serverless-stack/cli": "0.53.3",
-    "@serverless-stack/resources": "0.53.3"
+    "@serverless-stack/resources": "0.53.3",
+    "aws-lambda-ses-forwarder": "^5.0.0"
   }
 }

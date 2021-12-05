@@ -1,35 +1,56 @@
 import { Context, SESEvent } from 'aws-lambda'
-import { S3 } from '@aws-sdk/client-s3'
+import * as AWS from 'aws-sdk'
 
-const BUCKET_NAME = process.env.BUCKET_NAME
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const forwarder = require('aws-lambda-ses-forwarder')
+
+const BUCKET_NAME = process.env.BUCKET_NAME as string
+const FORWARD_MAPPING_SSM_KEY = process.env.FORWARD_MAPPING_SSM_KEY as string
+
+const ssm = new AWS.SSM()
+
+// store the email mapping outside of the handler function to not load it every time the Lambda function is invoked
+let forwardMapping: unknown = null
 
 export const handler = async (event: SESEvent, context: Context): Promise<void> => {
-  console.log('EVENT', event)
-  console.log('CONTEXT', context)
-  const record = event.Records[0].ses
-  const messageId = record.mail.messageId
-  const message = await readMessageFromS3(messageId)
-  console.log('MESSAGE', message)
-
-}
-
-async function readMessageFromS3(messageId: string): Promise<Buffer> {
-  try {
-    const { Body: data } = await new S3({
-      region: 'eu-west-1'
-    }).getObject({
-        Bucket: BUCKET_NAME,
-        Key: messageId,
-      })
-
-    if (!(data instanceof Buffer))
-      throw new Error(
-        `Unexpected type of the S3 bucket object body: '${typeof data}'. Expected Buffer`
+  await loadEmailMappingFromSsm()
+  if (forwardMapping) {
+    const config = {
+      fromEmail: event.Records[0].ses.mail.source,
+      emailBucket: BUCKET_NAME,
+      emailKeyPrefix: '',
+      forwardMapping,
+    };
+    return new Promise((resolve, reject) => {
+      forwarder.handler(
+        event,
+        context,
+        (error: unknown) => {
+          if (error) {
+            reject()
+          } else {
+            resolve()
+          }
+        },
+        { config },
       )
-    return data
-  } catch (e) {
-    throw new Error(
-      `Could not fetch message ID ${messageId} from S3 bucket: ${e}`
-    )
+    })
+  }
+  }
+
+async function loadEmailMappingFromSsm() {
+  if (!forwardMapping) {
+    const ssmValue = await ssm
+      .getParameter({
+        Name: FORWARD_MAPPING_SSM_KEY
+      })
+      .promise()
+
+    if (ssmValue.Parameter?.Value) {
+      forwardMapping = JSON.parse(ssmValue.Parameter.Value)
+      console.log('emailMapping', ssmValue.Parameter.Value)
+    } else {
+      console.error('email mapping not found', FORWARD_MAPPING_SSM_KEY)
+    }
   }
 }
