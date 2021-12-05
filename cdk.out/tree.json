@@ -1,0 +1,221 @@
+{
+  "version": "tree-0.1",
+  "tree": {
+    "id": "App",
+    "path": "",
+    "children": {
+      "Tree": {
+        "id": "Tree",
+        "path": "Tree",
+        "constructInfo": {
+          "fqn": "@aws-cdk/core.Construct",
+          "version": "1.132.0"
+        }
+      },
+      "serverless-email-forwarder-email-forwarder-stack": {
+        "id": "serverless-email-forwarder-email-forwarder-stack",
+        "path": "serverless-email-forwarder-email-forwarder-stack",
+        "children": {
+          "SSTMetadata": {
+            "id": "SSTMetadata",
+            "path": "serverless-email-forwarder-email-forwarder-stack/SSTMetadata",
+            "constructInfo": {
+              "fqn": "@aws-cdk/core.CfnResource",
+              "version": "1.132.0"
+            }
+          },
+          "IncomingEmailBucket": {
+            "id": "IncomingEmailBucket",
+            "path": "serverless-email-forwarder-email-forwarder-stack/IncomingEmailBucket",
+            "children": {
+              "Notifications": {
+                "id": "Notifications",
+                "path": "serverless-email-forwarder-email-forwarder-stack/IncomingEmailBucket/Notifications",
+                "constructInfo": {
+                  "fqn": "@aws-cdk/core.Construct",
+                  "version": "1.132.0"
+                }
+              },
+              "Resource": {
+                "id": "Resource",
+                "path": "serverless-email-forwarder-email-forwarder-stack/IncomingEmailBucket/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::S3::Bucket",
+                  "aws:cdk:cloudformation:props": {
+                    "bucketName": "ungari.org-email-bucket",
+                    "tags": [
+                      {
+                        "key": "sst:app",
+                        "value": "email-forwarder"
+                      },
+                      {
+                        "key": "sst:stage",
+                        "value": "serverless"
+                      }
+                    ]
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-s3.CfnBucket",
+                  "version": "1.132.0"
+                }
+              },
+              "Policy": {
+                "id": "Policy",
+                "path": "serverless-email-forwarder-email-forwarder-stack/IncomingEmailBucket/Policy",
+                "children": {
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "serverless-email-forwarder-email-forwarder-stack/IncomingEmailBucket/Policy/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::S3::BucketPolicy",
+                      "aws:cdk:cloudformation:props": {
+                        "bucket": {
+                          "Ref": "IncomingEmailBucket24F1F25D"
+                        },
+                        "policyDocument": {
+                          "Statement": [
+                            {
+                              "Action": "s3:PutObject",
+                              "Condition": {
+                                "StringEquals": {
+                                  "aws:Referer": {
+                                    "Ref": "AWS::AccountId"
+                                  }
+                                }
+                              },
+                              "Effect": "Allow",
+                              "Principal": {
+                                "Service": "ses.amazonaws.com"
+                              },
+                              "Resource": {
+                                "Fn::Join": [
+                                  "",
+                                  [
+                                    {
+                                      "Fn::GetAtt": [
+                                        "IncomingEmailBucket24F1F25D",
+                                        "Arn"
+                                      ]
+                                    },
+                                    "/*"
+                                  ]
+                                ]
+                              }
+                            }
+                          ],
+                          "Version": "2012-10-17"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "@aws-cdk/aws-s3.CfnBucketPolicy",
+                      "version": "1.132.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-s3.BucketPolicy",
+                  "version": "1.132.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "@aws-cdk/aws-s3.Bucket",
+              "version": "1.132.0"
+            }
+          },
+          "EmailForwarderRuleSet": {
+            "id": "EmailForwarderRuleSet",
+            "path": "serverless-email-forwarder-email-forwarder-stack/EmailForwarderRuleSet",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "serverless-email-forwarder-email-forwarder-stack/EmailForwarderRuleSet/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::SES::ReceiptRuleSet",
+                  "aws:cdk:cloudformation:props": {}
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-ses.CfnReceiptRuleSet",
+                  "version": "1.132.0"
+                }
+              },
+              "Rule0": {
+                "id": "Rule0",
+                "path": "serverless-email-forwarder-email-forwarder-stack/EmailForwarderRuleSet/Rule0",
+                "children": {
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "serverless-email-forwarder-email-forwarder-stack/EmailForwarderRuleSet/Rule0/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::SES::ReceiptRule",
+                      "aws:cdk:cloudformation:props": {
+                        "rule": {
+                          "actions": [
+                            {
+                              "s3Action": {
+                                "bucketName": {
+                                  "Ref": "IncomingEmailBucket24F1F25D"
+                                }
+                              }
+                            }
+                          ],
+                          "enabled": true,
+                          "recipients": [
+                            "davide.ungari.org"
+                          ]
+                        },
+                        "ruleSetName": {
+                          "Ref": "EmailForwarderRuleSetE4BC8E94"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "@aws-cdk/aws-ses.CfnReceiptRule",
+                      "version": "1.132.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-ses.ReceiptRule",
+                  "version": "1.132.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "@aws-cdk/aws-ses.ReceiptRuleSet",
+              "version": "1.132.0"
+            }
+          },
+          "CDKMetadata": {
+            "id": "CDKMetadata",
+            "path": "serverless-email-forwarder-email-forwarder-stack/CDKMetadata",
+            "children": {
+              "Default": {
+                "id": "Default",
+                "path": "serverless-email-forwarder-email-forwarder-stack/CDKMetadata/Default",
+                "constructInfo": {
+                  "fqn": "@aws-cdk/core.CfnResource",
+                  "version": "1.132.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "@aws-cdk/core.Construct",
+              "version": "1.132.0"
+            }
+          }
+        },
+        "constructInfo": {
+          "fqn": "@aws-cdk/core.Stack",
+          "version": "1.132.0"
+        }
+      }
+    },
+    "constructInfo": {
+      "fqn": "@aws-cdk/core.App",
+      "version": "1.132.0"
+    }
+  }
+}

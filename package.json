@@ -1,0 +1,30 @@
+{
+  "name": "email-forwarder",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "test": "sst test",
+    "start": "sst start",
+    "build": "sst build",
+    "deploy": "sst deploy",
+    "remove": "sst remove"
+  },
+  "eslintConfig": {
+    "extends": [
+      "serverless-stack"
+    ]
+  },
+  "devDependencies": {
+    "@aws-cdk/assert": "1.132.0",
+    "@aws-cdk/aws-ses": "1.132.0",
+    "@aws-cdk/aws-ses-actions": "1.132.0",
+    "@tsconfig/node14": "^1.0.1",
+    "@types/aws-lambda": "^8.10.70",
+    "@types/node": "<15.0.0"
+  },
+  "dependencies": {
+    "@aws-cdk/core": "1.132.0",
+    "@serverless-stack/cli": "0.53.3",
+    "@serverless-stack/resources": "0.53.3"
+  }
+}
