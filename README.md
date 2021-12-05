@@ -4,14 +4,24 @@ This project is an implementation of a simple AWS email forwarder following [the
 
 ![diagram](./email-forwarder.png)
 
-1.A new email is sent from an external sender to your domain. Amazon SES handles the incoming email for your domain.
-2.An Amazon SES receipt rule saves the incoming message in an S3 bucket.
-3.An Amazon SES receipt rule triggers the execution of a Lambda function.
-4.The Lambda function retrieves the message content from S3, and then creates a new message and sends it to Amazon SES.
-5.Amazon SES sends the message to the destination server.
+1. A new email is sent from an external sender to your domain. Amazon SES handles the incoming email for your domain.
 
+2. An Amazon SES receipt rule saves the incoming message in an S3 bucket.
+
+3. An Amazon SES receipt rule triggers the execution of a Lambda function.
+
+4. The Lambda function retrieves the message content from S3, and then creates a new message and sends it to Amazon SES.
+
+5. Amazon SES sends the message to the destination server.
+
+We are using [serverless-stack](https://github.com/serverless-stack/serverless-stack) to manage infrastructure as code ( CDK under the hoods ) and Lambda development and deployment.
 
 ## Getting Started
+
+The project has two main configuration environment varibles:
+
+- BUCKET_NAME: which is the name of the S3 bucket of step 2 we are going to create
+- RECIPIENTS: is a comma separated lists of recipients we are going to handle with this email forwarder
 
 ### `npm run start`
 
